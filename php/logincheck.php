@@ -1,26 +1,27 @@
 <?php
-	
 	session_start();
-
-	include('../service/functions.php');
-	//include_once('db.php');
-	//require('db.php');
-	//require_once('db.php');
-
-	if(isset($_POST['submit'])){
-
-		$username = $_POST['username'];
-		$password = $_POST['password'];
-			
-		$user = validate($username, $password);
-
-		if(count($user) > 0 ){
-			$_SESSION['user'] = $user;
-			//echo "test";
-			header("location: ../views/home.php");
+	$emptyErr=$invalidErr="";
+	if(isset($_COOKIE['username'])){  
+		header("location: home.php");
+	}
+	if(isset($_REQUEST['submit'])){
+		$uname = $_REQUEST['uname'];
+		$pass =  $_REQUEST['pass'];
+		if(empty(trim($uname)) || empty(trim($pass))){
+			$emptyErr = "User name and Password is required";
 		}else{
-			echo "invalid username/password";
+		    $file = fopen('user.txt', 'r');
+			while(!feof($file))  {
+				$user = fgets($file);
+				$data = explode('|', $user);
+				if(trim($data[0]) == $uname && trim($data[1]) == $pass){
+				$_SESSION['uname'] = $uname;
+				$_SESSION['pass'] = $pass; 
+				setcookie('username', $uname, time()+3600, '/');
+				header("location: home.php");
+				}
+			}
+				$invalidErr="invalid user name or password";
 		}
-	}	
-
-?>
+	}
+?> 
