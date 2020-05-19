@@ -1,8 +1,8 @@
 <?php	
 	session_start();
-	if(!isset($_COOKIE['username'])){  
-		header("location: LogIn.php");
-	}
+if(!isset($_SESSION['username']) || $_SESSION['indicator'] != 0){
+  header("Location: login.php");
+}
 ?>
 
 
@@ -13,7 +13,7 @@
 </head>
 <body>
 	<center>
-		<h1>Welcome Home! <?= $_COOKIE['username']?></h1>
+		<h1>Welcome Home! <?= $_SESSION['username']?></h1>
 		<a href="FoodDetails.php">Food Details</a></br>
 		<a href="OrderFood.php">Order Food</a></br>
 		<a href="Notification.php">Notifications</a></br>

@@ -1,8 +1,8 @@
 <?php	
 	session_start();
-	if(!isset($_COOKIE['username'])){  
-		header("location: LogIn.php");
-	}
+if(!isset($_SESSION['username']) || $_SESSION['indicator'] != 0){
+  header("Location: login.php");
+}
 ?>
 
 <!DOCTYPE html>

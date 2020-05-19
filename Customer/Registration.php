@@ -1,133 +1,109 @@
 <?php
+include "include/db_connect.inc.php";
+$usernamewarning = $emailwarning = $passwordwarning = $confirmedpasswordwarning = $originalpass = $originalconfirmedpass = $uname = $uemail = $upass = $confirmedupass = $unameInDB =$upassToDB = "";
 
-$nameErr=$unameErr=$emailErr=$dobErr=$genderErr=$passErr=$cpassErr="";
-$name=$uname=$email=$dob=$gender=$add=$pass=$cpass="";
+if($_SERVER["REQUEST_METHOD"]=="POST"){
+  if(!empty($_POST['username'])){
+    $uname = mysqli_real_escape_string($conn, $_POST['username']);
+    if(!empty($_POST['email'])){
+      $uemail = mysqli_real_escape_string($conn, $_POST['email']);
+      if(!empty($_POST['password'])){
+          $originalpass = $_POST['password'];
+          $originalconfirmedpass = $_POST['confirmed_password'];
+        if($_POST['password'] === $_POST['confirmed_password']){
+          $upass = mysqli_real_escape_string($conn, $_POST['password']);
+          $upassToDB = password_hash($upass, PASSWORD_DEFAULT);
+          $sqlUserCheck = "SELECT username FROM login WHERE username = '$uname'";
+          $result = mysqli_query($conn, $sqlUserCheck);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (empty($_POST["name"])) {
-    $nameErr = "Name is required";
-  } else {
-  $name = test_input($_POST["name"]);}
-  if (empty($_POST["uname"])) {
-    $unameErr = "UserName is required";
-  } else {
-  $uname = test_input($_POST["uname"]);}
-  if (empty($_POST["email"])) {
-    $emailErr = "Email is required";
-  } else {
-    $email = test_input($_POST["email"]);
-	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-  $emailErr = "Invalid email format";} }
-  if (empty($_POST["dob"])) {
-    $dobErr = "DateOfBirth is required";
-  } else {
-    $dob = test_input($_POST["dob"]);
+          if($_COOKIE['passwordchk'] == 1){
+            if(mysqli_num_rows($result) > 0){
+              $usernamewarning = "User-Name already exist!";
+            }
+            else{
+              $sql = "INSERT INTO login (username, email, password, indicator) VALUES ('$uname', '$uemail', '$upassToDB', '0');";
+              mysqli_query($conn, $sql);
+              header('Location: success.php');
+            }
+          }
+          else{
+            $passwordwarning = "Password must be at least eight character long!!";
+          }
+        }
+        else{
+          $confirmedpasswordwarning = "Password does not match :(";
+        }
+      }
+      else{
+        $passwordwarning = "Please enter a password -_-";
+      }
+    }
+    else{
+      $emailwarning = "Please enter your email";
+    }
   }
-  if (empty($_POST["gender"])) {
-    $genderErr = "Gender is required";
-  } else {
-    $gender = test_input($_POST["gender"]);
+  else{
+    $usernamewarning = "User-Name cannot be empty!";
   }
-  if (empty($_POST["add"])) {
-    $add = "";
-  } else {
-    $add = test_input($_POST["add"]);
-  }  
-  if (empty($_POST["pass"])) {
-    $pass = "";
-  } else {
-    $pass = test_input($_POST["pass"]);
-    
-  	}
-  if (empty($_POST["cpass"])) {
-    $cpass = "";
-  } else {
-   $cpass = test_input($_POST["cpass"]);}
-     
 }
-
-  function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-
- }
  ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-	<title>
-	   REGISTRATION 
-	</title>
-</head>
-<body>
-<table>
-	<tr>
-	<td width=30%>
-	<center>
-	<h1>Food Delivery</h1>
-	<h2>Registration Form</h2>
-	<h3>Create An Account</h3>
-	<p><span class="error">* required field</span></p>
-	<form method="post" action="RegCheck.php"> 
-	<table>
-		<tr>
-			<td>Name: </td>
-			<td><input type="text" name="name" value="<?php echo $name;?>"/>
-			<span class="error">* <?php echo $nameErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>UserName: </td>
-			<td><input type="text" name="uname" value="<?php echo $uname;?>"/>
-			<span class="error">* <?php echo $unameErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>E-mail: </td>
-			<td><input type="text" name="email" value="<?php echo $email;?>"/>
-			<span class="error">* <?php echo $emailErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>DOB: </td>
-			<td><input type="date" name="dob" value="<?php echo $dob;?>" />
-			<span class="error">* <?php echo $dobErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>Gender: </td>
-			<td><input type="radio" name="gender" <?php if (isset($gender) && $gender=="female") echo "checked";?> value="female">Female
-				<input type="radio" name="gender" <?php if (isset($gender) && $gender=="male") echo "checked";?> value="male">Male
-				<input type="radio" name="gender" <?php if (isset($gender) && $gender=="other") echo "checked";?> value="other">Other
-				<span class="error">* <?php echo $genderErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>Address: </td>
-			<td><textarea name="add"><?php echo $add;?></textarea></td></br>
-		</tr>
-		<tr>
-			<td>Password: </td> 
-			<td><input type="password" name="pass" value="<?php echo $pass;?>"/>
-			<span class="error">* <?php echo $passErr;?></span></td></br>
-		</tr>
-		<tr>
-			<td>Confirm Password: </td>
-		    <td><input type="password" name="cpass" value="<?php echo $cpass;?>"/>
-			<span class="error">* <?php echo $cpassErr;?></span></td></br>
-		</tr>
-		<tr>		
-			<td colspan="2"><center> <input type="submit" name="submit" value="Sign Up"> </center></td>
-		</tr>
-		<tr>
-			<td colspan="2"><center>Already have an account?<a href="login.php">Login</a></center></td>
-		</tr>
-	</table>
-	</center>
+ <!DOCTYPE html>
+ <html lang="en" dir="ltr">
+   <head>
+     <meta charset="utf-8">
+     <title>Registration Page</title>
+     <link rel="stylesheet" href="./css/style.css">
+     <script src="functions.js"></script>
+   </head>
+        <h1 style="color : red"><center> WELCOME TO ONLINE FOOD DELIVERY <center> </h1>
+   <body>
+      <form class="" action="registration.php" method="post">
+        <div class="midpos" align="middle">
+            <h2 align="middle" style="color : cyan">Registration<br> Please fill up the following fields</h2>
+          <table>
+            <tr>
+              <td align="right" style="color:floralwhite"><label>User-Name </label><span style="color: whitesmoke">*</span></td>
+              <td><input type="text" name="username" value="<?php echo $uname ?>" style=" font-size: 20px; color : darkblue; background-color : mintcream;" required ></td>
+              <td style="color : orangered"><?php echo $usernamewarning ?></td>
+            </tr>
+            <tr>
+              <td align="right" style="color:floralwhite"><label>Email </label><span style="color: whitesmoke">*</span></td>
+              <td><input type="email" name="email" value="<?php echo $uemail ?>" style=" font-size: 20px; color : darkblue; background-color : mintcream;" required></td>
+              <td style="color : orangered"><?php echo $emailwarning ?></td>
+            </tr>
+            <tr>
+              <td align="right" style="color:floralwhite"><label>Password</label><span style="color: whitesmoke">*</span></td>
+              <td><input type="password" name="password" id="pass" value="<?php echo $originalpass ?>" style=" font-size: 20px; color : darkblue; background-color : mintcream;" required onkeyup="passwordValidity()"></td>
+              <td style="color : orangered"><label id="passcheck"><?php echo $passwordwarning ?></label></td>
+            </tr>
+            <tr>
+              <td align="right" style="color:floralwhite"><label>Confirm Password</label><span style="color: whitesmoke">*</span></td>
+              <td><input type="password" name="confirmed_password" value="<?php echo $originalconfirmedpass ?>" style=" font-size: 20px; color : darkblue; background-color : mintcream;" required></td>
+              <td style="color : orangered"><?php echo $confirmedpasswordwarning ?></td>
+            </tr>
+            <tr>
+              <td align="middle"><input id="btn_general" type="reset" name="btn_reset" value="Reset" style="width: 100%; font-size: 20px; height : 40px;"></td>
+              <td align="middle"><input id="btn_general" type="submit" name="btn_register" value="Register" style="width: 100%; font-size: 20px; height : 40px;"></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+      </form>
+   </body>
+ </html>
 
-	</form>
-	</td>
-	</tr>
-	</table>
-</body>
-
-
-</html>
+ <script>
+ function passwordValidity(){
+   var password = document.getElementById('pass').value;
+   if(password.length < 8)
+   {
+   document.getElementById('passcheck').innerText = "Password must be at least eight character long!!";
+   document.cookie = "passwordchk = 0"
+ }
+ else{
+   document.getElementById('passcheck').innerText = "";
+   document.cookie = "passwordchk = 1"
+ }
+ }
+ </script>
