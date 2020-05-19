@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	if(isset($_COOKIE['username'])){  
-		header("location: home.php");
+		header("location: ../views/home.php");
 	}
 	$nameErr=$unameErr=$emailErr=$passErr=$conpassErr=$existedErr=$conMsg=$matchErr="";
 	global $found;
@@ -30,30 +30,7 @@
 			if((trim($pass)) != (trim($conpass))){
 				$matchErr = "password and confirm password didn't match";
 			}else{
-				$file = fopen("user.txt", "r");
-				while(!feof($file))  {
-					$user = fgets($file);
-					$data = explode('|',$user);
-					if(isset($data[0]) && trim($data[0]) == $uname){
-						$existedErr = "User name or email already existed";
-						$found=1;
-						fclose($file);
-						break;
-					}
-					else if(isset($data[2]) && trim($data[2]) == $email){
-						$existedErr = "User name or email already existed";
-						$found=1;
-						fclose($file);
-						break;
-					}
-				}
-				if(!$found){
-					$file = fopen("user.txt", "a");
-					$txt = $uname."|".$pass."|".$email."|".$name."\n\r";
-					fwrite($file, $txt);
-					fclose($file);
-					$conMsg = "<br><h3>CONGRATULATIONS,Your registration is succesful !</h3><br>";
-				}
+				
 			}
 		}
 	}
