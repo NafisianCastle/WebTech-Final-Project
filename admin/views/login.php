@@ -12,7 +12,7 @@
 		<tr>
 		<td width="50%">
 		<center>
-		<form method="POST" action="login.php">
+		<form method="POST" action="../php/logincheck.php">
 			<span class="error"><?php echo $emptyErr;?></span>
 			<span class="error"><?php echo $invalidErr;?></span>
 			<table>

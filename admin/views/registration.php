@@ -15,7 +15,7 @@
 		</td>
 		<td width="35%">
 		<center>
-			<form method="POST" action="registration.php">
+			<form method="POST" action="../php/regCheck.php">
 				<h1>Create A New Account!</h1>
 				<fieldset style="width:400px">
 				<p><span class="error">* required field</span></p>
